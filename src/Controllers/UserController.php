@@ -5,7 +5,6 @@ namespace Src\Controllers;
 use Src\Services\UserService;
 use Src\DTO\User\UserResponseDto;
 
-// тут будет дто, и методы из сервиса + всякие проверки от туда же
 class UserController {
 
     private UserService $userService;
@@ -14,13 +13,13 @@ class UserController {
         $this->userService = new UserService();
     }
 
-    public function getUser(int $id): array {
-        $user = $this->userService->getUser($id);
+    public function createUser($dto): array {
+        $user = $this->userService->create($dto);
         return (new UserResponseDto($user->getId(), $user->getUsername(), $user->getEmail()))->toArray();
     }
 
-    public function createUser($dto): array {
-        $user = $this->userService->create($dto);
+    public function getUser(int $id): array {
+        $user = $this->userService->getUser($id);
         return (new UserResponseDto($user->getId(), $user->getUsername(), $user->getEmail()))->toArray();
     }
 

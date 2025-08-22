@@ -17,7 +17,7 @@ class UserService {
 
 
     public function authenticate(UserLoginDto $dto): User {
-        $user = $this->userRepo->getUserByEmail($dto->email);
+        $user = $this->userRepo->getUserByUsername($dto->username);
         if (!$user) {
             throw new UnexpectedValueException('Email not found');
         }

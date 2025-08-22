@@ -28,7 +28,7 @@ class UserCreateDto {
         $errors = [];
 
         if (empty($this->username)) {
-            $errors[] = "Имя не может быть пустым";
+            $errors[] = "Name cannot be empty";
         }
         if (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = "Некорректный email";

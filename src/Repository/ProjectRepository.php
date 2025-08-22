@@ -42,7 +42,7 @@ class ProjectRepository implements ProjectRepositoryInterface {
         );
 
         $stmt->execute([
-            'id'          => $newProject->getId(),
+            //'id'          => $newProject->getId(),
             'name'        => $newProject->getName(),
             'description' => $newProject->getDescription(),
             'ownerId'     => $newProject->getOwnerId(),
