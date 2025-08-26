@@ -2,6 +2,7 @@
 
 namespace Src\Controllers;
 
+use Src\DTO\Project\ProjectResponseDto;
 use Src\Services\ProjectService;
 
 class ProjectController {
@@ -21,6 +22,52 @@ class ProjectController {
 
     public function createProject($dto): array {
         $project = $this->projectService->createProject($dto);
-        return (new )
+        return (new ProjectResponseDto($project->getId(), $project->getName(), $project->getDescription(), $project->getCreatedAt()))->toArray();
     }
+
+    public function getProject(int $id): array {
+        $project = $this->projectService->getProjectById($id);
+        return (new ProjectResponseDto(
+            $project->getId(),
+            $project->getName(),
+            $project->getDescription(),
+            $project->getOwnerId()
+        ))->toArray();
+    }
+
+    public function getProjects(int $userId): array {
+        $projects = $this->projectService->getAllProjectsByUserId($userId);
+
+        return array_map(function($project) {
+            return (new ProjectResponseDto(
+                $project->getId(),
+                $project->getName(),
+                $project->getDescription(),
+                $project->getOwnerId()
+            ))->toArray();
+        }, $projects);
+    }
+
+    public function updateProject($dto): array {
+        $project = $this->projectService->updateProject($dto);
+        return (new ProjectResponseDto($project->getId(), $project->getName(), $project->getDescription(), $project->getCreatedAt()))->toArray();
+    }
+
+    public function deleteProject(int $id): array {
+        $result = $this->projectService->deleteProjectById($id);
+
+        if ($result) {
+            return [
+                'success' => true,
+                'message' => 'Project successfully deleted',
+                'deletedId' => $id
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Project not found or could not be deleted'
+            ];
+        }
+    }
+
 }

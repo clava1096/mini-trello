@@ -22,53 +22,88 @@ use Src\Router;
 
 
 $userController = new UserController();
-$projectContoller = new ProjectController();
+$projectsController = new ProjectController();
 
 $router = new Router();
 
-// POST api/user/register + json
-$router->addRoute('POST', 'api/user/register', function() use ($userController) {
-    $json = file_get_contents('php://input');
-    $dto = UserCreateDto::fromJson($json);
+// USER:
+{
+    // POST api/user/register + json
+    $router->addRoute('POST', 'api/user/register', function() use ($userController) {
+        $json = file_get_contents('php://input');
+        $dto = UserCreateDto::fromJson($json);
 
-    if (!empty($dto->validate())) {
-        return $dto;
-    }
+        if (!empty($dto->validate())) {
+            return $dto;
+        }
 
-    return $userController->createUser($dto);
-});
+        return $userController->createUser($dto);
+    });
 
-// POST api/user/login + json
-$router->addRoute('POST', 'api/user/login', function() use ($userController) {
-    $json = file_get_contents('php://input');
-    $dto = UserLoginDto::fromJson($json);
+    // POST api/user/login + json
+    $router->addRoute('POST', 'api/user/login', function() use ($userController) {
+        $json = file_get_contents('php://input');
+        $dto = UserLoginDto::fromJson($json);
 
-    if (!empty($dto->validate())) {
-        return $dto;
-    }
+        if (!empty($dto->validate())) {
+            return $dto;
+        }
 
-    return $userController->authUser($dto);
-});
+        return $userController->authUser($dto);
+    });
 
-//GET api/user/me
-$router->addRoute('GET', 'api/user/me', function() use ($userController) {
-    $userId = requireAuth();
-    return $userController->getUser($userId);
-});
+    // GET api/user/me
+    $router->addRoute('GET', 'api/user/me', function() use ($userController) {
+        $userId = requireAuth();
+        return $userController->getUser($userId);
+    });
 
-// GET api/user/{id}
-$router->addRoute('GET', 'api/user/{id}', function($id) use ($userController) {
-    requireAuth();
-    return $userController->getUser($id);
-});
+    // GET api/user/{id}
+    $router->addRoute('GET', 'api/user/{id}', function($id) use ($userController) {
+        requireAuth();
+        return $userController->getUser($id);
+    });
 
-// POST api/user/logout
-$router->addRoute('POST', 'api/user/logout', fn() => $userController->logout());
+    // POST api/user/logout
+    $router->addRoute('POST', 'api/user/logout', fn() => $userController->logout());
 
-// POST /api/projects
-$router->addRoute('POST', '/api/projects', function() use ($projectsController) {
+}
 
-});
+// PROJECTS:
+{
+    // POST /api/projects – создать проект
+    $router->addRoute('POST', '/api/projects', function() use ($projectsController) {
+
+    });
+
+    //GET /api/projects – список всех проектов, где участвует пользователь
+    $router->addRoute('POST', '/api/projects', function() use ($projectsController) {
+        $userId = requireAuth();
+        return $projectsController->getProjects($userId);
+    });
+
+    //GET /api/projects/:id – получить проект по id
+    $router->addRoute('POST', '/api/projects/{id}', function($id) use ($projectsController) {
+        requireAuth();
+        return $projectsController->getProject($id);
+    });
+
+    //PUT /api/projects/:id – обновить проект (название/описание)
+    $router->addRoute('GET', 'api/projects/{id}', function($id) use ($projectsController) {
+        requireAuth();
+        return $projectsController->getProject($id);
+    });
+    //DELETE /api/projects/:id – удалить проект
+    $router->addRoute('DELETE', 'api/projects/{id}', function($id) use ($projectsController) {
+        requireAuth();
+        return $projectsController->deleteProject($id);
+    });
+}
+
+// PROJECT MEMBERS:
+{
+
+}
 $router->dispatch($_SERVER['REQUEST_URI']);
 
 

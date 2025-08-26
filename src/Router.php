@@ -5,7 +5,7 @@ namespace Src;
 class Router {
     private static array $routes = [];
 
-    public function addRoute(string $method, string $pattern, callable $handler) {
+    public function addRoute(string $method, string $pattern, callable $handler): void {
         self::$routes[] = [
             'method'  => strtoupper($method),
             'pattern' => $pattern,
@@ -13,7 +13,7 @@ class Router {
         ];
     }
 
-    public function dispatch(string $uri) {
+    public function dispatch(string $uri): void {
         $path   = parse_url($uri, PHP_URL_PATH);
         $method = $_SERVER['REQUEST_METHOD'];
 
@@ -45,7 +45,7 @@ class Router {
         self::notFound();
     }
 
-    private function notFound() {
+    private function notFound(): void {
         http_response_code(404);
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(["error" => "Страница не найдена"]);
