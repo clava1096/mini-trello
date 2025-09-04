@@ -3,6 +3,7 @@
 namespace Src\Services;
 
 use Src\DTO\ProjectMembers\ProjectMembersAddDto;
+use Src\DTO\ProjectMembers\ProjectMembersDeleteDto;
 use Src\Models\ProjectMembers;
 use Src\Repository\ProjectMembersRepository;
 
@@ -28,8 +29,9 @@ class ProjectMembersService {
         return $this->projectMembersRepository->addMemberToProject($id, $dto->userIds);
     }
 
-    public function removeMemberFromProject(ProjectMembersAddDto $dto): ProjectMembers {
-        return $this->projectMembersRepository->removeMemberFromProject($dto->projectId, $dto->userId);
+    public function removeMemberFromProject($id, $user_id): bool
+    {
+        return $this->projectMembersRepository->removeMemberFromProject($id, $user_id);
     }
 
     public function getAllMembersFromProject(int $projectId): array {

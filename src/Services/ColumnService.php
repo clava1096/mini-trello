@@ -25,6 +25,7 @@ class ColumnService {
 
     public function createColumn(CreateColumnDto $dto): Column {
         $column = new Column(
+            $dto->id,
             $dto->boardId,
             $dto->name,
             $dto->position ?? 0

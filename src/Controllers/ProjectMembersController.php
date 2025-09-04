@@ -3,6 +3,7 @@
 namespace Src\Controllers;
 
 use Src\DTO\ProjectMembers\ProjectMembersAddDto;
+use Src\DTO\ProjectMembers\ProjectMembersDeleteDto;
 use Src\Models\Project;
 use Src\Models\ProjectMembers;
 use Src\Services\ProjectMembersService;
@@ -19,8 +20,9 @@ class ProjectMembersController {
         return $this->projectMembersService->addMemberToProject($dto, $id);
     }
 
-    public function removeMemberFromProject(ProjectMembersAddDto $dto): ProjectMembers {
-        return $this->projectMembersService->removeMemberFromProject($dto);
+    public function removeMemberFromProject($id, $user_id): bool
+    {
+        return $this->projectMembersService->removeMemberFromProject($id, $user_id);
     }
 
     public function getAllMembersFromProject(int $projectId): array {

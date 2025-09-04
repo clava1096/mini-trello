@@ -1,6 +1,8 @@
 <?php
 
 namespace Src\DTO\Column;
+use InvalidArgumentException;
+
 class CreateColumnDto {
     public function __construct(
         public int $id,

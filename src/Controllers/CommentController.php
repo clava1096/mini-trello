@@ -32,7 +32,7 @@ class CommentController {
                 $comment->getCardId(),
                 $comment->getUserId(),
                 $comment->getContent(),
-                $comment->getCreatedAt()
+                time() // TODO косяк со временем.
             ))->toArray();
         }, $comments);
     }

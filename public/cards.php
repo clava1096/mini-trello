@@ -12,6 +12,7 @@ return function (Router $router, CardController $cardController) {
         $dto = CreateCardDto::fromJson($json);
 
         $errors = $dto->validate();
+        $dto->columnId = $id;
         if (!empty($errors)) {
             http_response_code(400);
             return ["errors" => $errors];

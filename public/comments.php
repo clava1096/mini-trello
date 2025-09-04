@@ -10,8 +10,8 @@ return function (Router $router, CommentController $commentController) {
         $userId = requireAuth();
         $json = file_get_contents('php://input');
         $dto = CreateCommentDto::fromJson($json);
-
         $errors = $dto->validate();
+        $dto->cardId = $id;
         if (!empty($errors)) {
             http_response_code(400);
             return ["errors" => $errors];

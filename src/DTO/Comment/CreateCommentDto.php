@@ -1,6 +1,8 @@
 <?php
 
 namespace Src\DTO\Comment;
+use InvalidArgumentException;
+
 class CreateCommentDto {
     public function __construct(
         public int $cardId,

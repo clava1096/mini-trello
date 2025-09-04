@@ -1,4 +1,5 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 // ==================== CORS HANDLING ====================
 header('Access-Control-Allow-Origin: http://localhost:9000');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -25,20 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ==================== ORIGINAL CODE ====================
-spl_autoload_register(function ($class) {
-    $prefix = "Src\\";
+require_once __DIR__ . '/../config/db/Database.php';
 
-    if (!str_starts_with($class, $prefix)) {
-        return;
-    }
-
-    $file = __DIR__ . "/../src/" . str_replace("\\", "/", substr($class, 4)) . ".php";
-
-    if (file_exists($file)) {
-        require $file;
-    }
-});
-require_once __DIR__ . '/../config/db/Db.php';
 
 use Src\Controllers\UserController;
 use Src\Controllers\ProjectController;
