@@ -15,6 +15,7 @@ class UserController {
 
     public function createUser($dto): array {
         $user = $this->userService->create($dto);
+        error_log(print_r($user, true));
         return (new UserResponseDto($user->getId(), $user->getUsername(), $user->getEmail()))->toArray();
     }
 

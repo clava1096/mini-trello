@@ -13,7 +13,7 @@ class Project {
 
     private int $createdAt;
 
-    public function __construct(?int $id = null, string $name, string $description, int $ownerId, int $createdAt) {
+    public function __construct(int $id, string $name, string $description, int $ownerId, int $createdAt) {
         $this->id = $id;
         $this->name = $name;
         $this->description = $description;

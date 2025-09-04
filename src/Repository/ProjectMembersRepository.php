@@ -8,17 +8,38 @@ class ProjectMembersRepository implements ProjectMembersRepositoryInterface {
     private PDO $pdo;
 
     public function __construct() {
-        $pdo = Database::getConnection();
+        $this->pdo = Database::getConnection();
     }
 
-    public function addMemberToProject($projectId, $memberId): bool {
-        $stmt = $this->pdo->prepare("
-        INSERT INTO projects_members (project_id, user_id) VALUES (:project_id, :member_id)");
-        $stmt->execute([
-            "project_id" => $projectId,
-            "member_id" => $memberId
-        ]);
-        return $stmt->rowCount() > 0;
+    public function addMemberToProject(int $projectId, array $userIds): bool
+    {
+        if (empty($userIds)) {
+            return 0;
+        }
+
+        // Удаляем дубликаты
+        $userIds = array_unique($userIds);
+
+        // Создаем плейсхолдеры для запроса
+        $placeholders = [];
+        $values = [];
+
+        foreach ($userIds as $index => $userId) {
+            $placeholders[] = "(:project_id, :user_id_$index)";
+            $values["user_id_$index"] = $userId;
+        }
+
+        $values['project_id'] = $projectId;
+
+        // Используем INSERT IGNORE чтобы пропустить дубликаты
+        $sql = "
+        INSERT IGNORE INTO projects_members (project_id, user_id) 
+        VALUES " . implode(', ', $placeholders);
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($values);
+
+        return $stmt->rowCount();
     }
 
     public function removeMemberFromProject($projectId, $memberId): bool {

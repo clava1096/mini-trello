@@ -22,9 +22,9 @@ class UserService {
             throw new UnexpectedValueException('Email not found');
         }
 
-        if (strcasecmp($user->getUsername(), $dto->username) !== 0) {
-            throw new UnexpectedValueException("Username not found");
-        }
+        error_log("Input password: " . $dto->password);
+        error_log("Stored hash: " . $user->getPassword());
+        error_log("Password verify result: " . (password_verify($dto->password, $user->getPassword()) ? 'TRUE' : 'FALSE'));
 
         if (!password_verify($dto->password, $user->getPassword())) {
             throw new UnexpectedValueException("Wrong password");
@@ -50,8 +50,9 @@ class UserService {
         if (!$hashedPassword) {
             throw new UnexpectedValueException("Error while hash password");
         }
-
-        return $this->userRepo->create($dto->username, $dto->email, $hashedPassword);
+        $user = new User(0, $dto->username, $dto->email, $hashedPassword);
+        error_log(print_r($user, true));
+        return $this->userRepo->create($user);
     }
 
     public function getUser($id): User {

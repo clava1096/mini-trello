@@ -4,6 +4,7 @@ namespace Src\Repository;
 
 use Config\Db\Database;
 use PDO;
+use RuntimeException;
 use Src\Models\Project;
 
 class ProjectRepository implements ProjectRepositoryInterface {
@@ -34,20 +35,19 @@ class ProjectRepository implements ProjectRepositoryInterface {
     public function update(Project $newProject): bool {
         $stmt = $this->db->prepare(
             "UPDATE projects
-           SET name = :name,
-             description = :description,
-             owner_id = :ownerId,
-             created_at = : createdAt
-          WHERE id = :id"
+        SET name = :name,
+            description = :description,
+            owner_id = :owner_id
+        WHERE id = :id"
         );
 
         $stmt->execute([
-            //'id'          => $newProject->getId(),
-            'name'        => $newProject->getName(),
-            'description' => $newProject->getDescription(),
-            'ownerId'     => $newProject->getOwnerId(),
-            'createdAt'   => $newProject->getCreatedAt(),
+            ':id' => $newProject->getId(),
+            ':name' => $newProject->getName(),
+            ':description' => $newProject->getDescription(),
+            ':owner_id' => $newProject->getOwnerId(),
         ]);
+
         return $stmt->rowCount() > 0;
     }
 
@@ -62,32 +62,35 @@ class ProjectRepository implements ProjectRepositoryInterface {
     public function getProjectById(int $id): ?Project
     {
         $stmt = $this->db->prepare(
-            "SELECT * FROM projects WHERE id = :?"
+            "SELECT * FROM projects WHERE id = ?"
         );
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            return new Project($row['id'], $row['name'], $row['description'], $row['ownerId'], $row['createdAt']);
+            return new Project($row['id'], $row['name'], $row['description'], $row['owner_id'], strtotime($row['created_at']));
         }
-        return null;
+        throw new RuntimeException("Проект #$id не найден");
     }
 
     public function getAllProjectsByUserId(int $userId): array {
         $stmt = $this->db->prepare(
-            "SELECT p.*
-            FROM projects p
-            LEFT JOIN projects_members pm on p.id = pm.project_id
-            WHERE pm.user_id = :userId OR p.owner_id = :userId");
+            "SELECT p.id, p.name, p.description, p.owner_id, p.created_at
+        FROM projects p
+        LEFT JOIN projects_members pm on p.id = pm.project_id
+        WHERE pm.user_id = :userId OR p.owner_id = :userId"
+        );
         $stmt->execute(['userId' => $userId]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $projects = [];
 
         foreach ($rows as $row) {
-            $projects[] = new Project($row['id'],
+            $projects[] = new Project(
+                $row['id'],
                 $row['name'],
                 $row['description'],
-                $row['ownerId'],
-                $row['createdAt']);
+                $row['owner_id'],
+                strtotime($row['created_at'])
+            );
         }
 
         return $projects;

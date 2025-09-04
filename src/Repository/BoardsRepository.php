@@ -66,8 +66,7 @@ class BoardsRepository implements BoardsRepositoryInterface{
             $boards[] = new Board(
                 $row['id'],
                 $row['project_id'],
-                $row['name'],
-                $row['createdAt']
+                $row['name']
             );
         }
         return $boards;
@@ -83,7 +82,7 @@ class BoardsRepository implements BoardsRepositoryInterface{
         ]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
-            return new Board($row['id'], $row['project_id'], $row['name'], $row['createdAt']);
+            return new Board($row['id'], $row['project_id'], $row['name']);
         }
         return null;
     }

@@ -11,9 +11,9 @@ class Comment {
 
     private string $content;
 
-    private int $createdAt;
+    private string $createdAt;
 
-    public function __construct(int $id, int $cardId, int $userId, string $content, int $createdAt)
+    public function __construct(int $id, int $cardId, int $userId, string $content, string $createdAt)
     {
         $this->id = $id;
         $this->cardId = $cardId;
@@ -67,7 +67,7 @@ class Comment {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(int $createdAt): void
+    public function setCreatedAt(string $createdAt): void
     {
         $this->createdAt = $createdAt;
     }

@@ -22,11 +22,10 @@ class Router {
                 continue;
             }
 
-            // преобразуем шаблон: /user/{id} → /user/(\d+)
             $regex = preg_replace('#\{[^/]+\}#', '([^/]+)', $route['pattern']);
 
             if (preg_match("#^{$regex}$#", $path, $matches)) {
-                array_shift($matches); // убираем полный матч
+                array_shift($matches);
 
                 header('Content-Type: application/json; charset=utf-8');
                 try {

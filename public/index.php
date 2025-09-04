@@ -1,4 +1,30 @@
 <?php
+// ==================== CORS HANDLING ====================
+header('Access-Control-Allow-Origin: http://localhost:9000');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept');
+header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Max-Age: 3600');
+
+// Handle preflight OPTIONS request
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
+// Set content type for all responses
+header('Content-Type: application/json');
+
+error_log('Request method: ' . $_SERVER['REQUEST_METHOD']);
+error_log('Request URI: ' . $_SERVER['REQUEST_URI']);
+error_log('Content-Type: ' . ($_SERVER['CONTENT_TYPE'] ?? 'not set'));
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $input = file_get_contents('php://input');
+    error_log('Request body: ' . $input);
+}
+
+// ==================== ORIGINAL CODE ====================
 spl_autoload_register(function ($class) {
     $prefix = "Src\\";
 
@@ -16,113 +42,75 @@ require_once __DIR__ . '/../config/db/Db.php';
 
 use Src\Controllers\UserController;
 use Src\Controllers\ProjectController;
-use Src\DTO\User\UserCreateDto;
-use Src\DTO\User\UserLoginDto;
+use Src\Controllers\ProjectMembersController;
+use Src\Controllers\BoardController;
+use Src\Controllers\ColumnController;
+use Src\Controllers\CardController;
+use Src\Controllers\CommentController;
 use Src\Router;
-
 
 $userController = new UserController();
 $projectsController = new ProjectController();
+$projectMembersController = new ProjectMembersController();
+$boardController = new BoardController();
+$columnController = new ColumnController();
+$cardController = new CardController();
+$commentController = new CommentController();
 
 $router = new Router();
 
-// USER:
-{
-    // POST api/user/register + json
-    $router->addRoute('POST', 'api/user/register', function() use ($userController) {
-        $json = file_get_contents('php://input');
-        $dto = UserCreateDto::fromJson($json);
+//  USER
+$userRoutes = require __DIR__ . '/user.php';
+$userRoutes($router, $userController);
 
-        if (!empty($dto->validate())) {
-            return $dto;
-        }
+//  PROJECTS
+$projectRoutes = require __DIR__ . '/projects.php';
+$projectRoutes($router, $projectsController);
 
-        return $userController->createUser($dto);
-    });
+//  PROJECT MEMBERS
+$projectMembersRoutes = require __DIR__ . '/project_members.php';
+$projectMembersRoutes($router, $projectMembersController);
 
-    // POST api/user/login + json
-    $router->addRoute('POST', 'api/user/login', function() use ($userController) {
-        $json = file_get_contents('php://input');
-        $dto = UserLoginDto::fromJson($json);
+//  BOARDS
+$boardRoutes = require __DIR__ . '/boards.php';
+$boardRoutes($router, $boardController);
 
-        if (!empty($dto->validate())) {
-            return $dto;
-        }
+//  COLUMNS
+$columnRoutes = require __DIR__ . '/columns.php';
+$columnRoutes($router, $columnController);
 
-        return $userController->authUser($dto);
-    });
+//  CARDS
+$cardRoutes = require __DIR__ . '/cards.php';
+$cardRoutes($router, $cardController);
 
-    // GET api/user/me
-    $router->addRoute('GET', 'api/user/me', function() use ($userController) {
-        $userId = requireAuth();
-        return $userController->getUser($userId);
-    });
+//  COMMENTS
+$commentRoutes = require __DIR__ . '/comments.php';
+$commentRoutes($router, $commentController);
 
-    // GET api/user/{id}
-    $router->addRoute('GET', 'api/user/{id}', function($id) use ($userController) {
-        requireAuth();
-        return $userController->getUser($id);
-    });
 
-    // POST api/user/logout
-    $router->addRoute('POST', 'api/user/logout', fn() => $userController->logout());
-
+// Add error handling for the router
+try {
+    $router->dispatch($_SERVER['REQUEST_URI']);
+} catch (Exception $e) {
+    http_response_code($e->getCode() ?: 500);
+    echo json_encode(['error' => $e->getMessage()]);
 }
-
-// PROJECTS:
-{
-    // POST /api/projects – создать проект
-    $router->addRoute('POST', '/api/projects', function() use ($projectsController) {
-
-    });
-
-    //GET /api/projects – список всех проектов, где участвует пользователь
-    $router->addRoute('POST', '/api/projects', function() use ($projectsController) {
-        $userId = requireAuth();
-        return $projectsController->getProjects($userId);
-    });
-
-    //GET /api/projects/:id – получить проект по id
-    $router->addRoute('POST', '/api/projects/{id}', function($id) use ($projectsController) {
-        requireAuth();
-        return $projectsController->getProject($id);
-    });
-
-    //PUT /api/projects/:id – обновить проект (название/описание)
-    $router->addRoute('GET', 'api/projects/{id}', function($id) use ($projectsController) {
-        requireAuth();
-        return $projectsController->getProject($id);
-    });
-    //DELETE /api/projects/:id – удалить проект
-    $router->addRoute('DELETE', 'api/projects/{id}', function($id) use ($projectsController) {
-        requireAuth();
-        return $projectsController->deleteProject($id);
-    });
-}
-
-// PROJECT MEMBERS:
-{
-
-}
-$router->dispatch($_SERVER['REQUEST_URI']);
 
 
 
 function requireAuth(): int {
-    session_name("PHPSESSID"); // или "HTTPSESSION", если ты сменил имя
+    session_name("PHPSESSID");
     session_start();
 
     if (!isset($_SESSION['id'])) {
         http_response_code(401);
-        echo json_encode(["error" => "Unauthorized"]);
-        exit; // завершаем выполнение
+        throw new Exception("Unauthorized");
     }
 
-    return $_SESSION['id']; // можно вернуть id пользователя
+    return $_SESSION['id'];
 }
 /*
- * написать свою систему id
- *
+
 🔑 Auth / Users
 POST /api/register – регистрация пользователя
 POST /api/login – авторизация (возвращает токен / сессию)

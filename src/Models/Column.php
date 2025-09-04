@@ -9,7 +9,8 @@ class Column {
     private string $name;
 
     private int $position;
-    public function __construct(int $boardId, string $name, int $position) {
+    public function __construct(int $id, int $boardId, string $name, int $position) {
+        $this->id = $id;
         $this->boardId = $boardId;
         $this->name = $name;
         $this->position = $position;

@@ -22,7 +22,7 @@ class ProjectController {
 
     public function createProject($dto): array {
         $project = $this->projectService->createProject($dto);
-        return (new ProjectResponseDto($project->getId(), $project->getName(), $project->getDescription(), $project->getCreatedAt()))->toArray();
+        return (new ProjectResponseDto($project->getId(), $project->getName(), $project->getDescription(),$project->getOwnerId(), $project->getCreatedAt()))->toArray();
     }
 
     public function getProject(int $id): array {
@@ -50,7 +50,7 @@ class ProjectController {
 
     public function updateProject($dto): array {
         $project = $this->projectService->updateProject($dto);
-        return (new ProjectResponseDto($project->getId(), $project->getName(), $project->getDescription(), $project->getCreatedAt()))->toArray();
+        return (new ProjectResponseDto($project->getId(), $project->getName(), $project->getDescription(),$project->getOwnerId(), $project->getCreatedAt()))->toArray();
     }
 
     public function deleteProject(int $id): array {

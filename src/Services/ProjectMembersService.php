@@ -20,20 +20,23 @@ class ProjectMembersService {
     private ProjectMembersRepository $projectMembersRepository;
 
     public function __construct() {
-        $projectMembersRepository = new ProjectMembersRepository();
+        $this->projectMembersRepository = new ProjectMembersRepository();
     }
 
-    public function addMemberToProject(ProjectMembersAddDto $dto): ProjectMembers {
-
+    public function addMemberToProject(ProjectMembersAddDto $dto, int $id): bool
+    {
+        return $this->projectMembersRepository->addMemberToProject($id, $dto->userIds);
     }
 
     public function removeMemberFromProject(ProjectMembersAddDto $dto): ProjectMembers {
-
+        return $this->projectMembersRepository->removeMemberFromProject($dto->projectId, $dto->userId);
     }
 
-    public function get()
-    {
-
+    public function getAllMembersFromProject(int $projectId): array {
+        if ($projectId  < 0 ) {
+            throw new InvalidArgumentException("your projectId must be not null");
+        }
+        return $this->projectMembersRepository->getAllMembersFromProject($projectId);
     }
 
 

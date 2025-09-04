@@ -6,8 +6,7 @@ use InvalidArgumentException;
 
 class ProjectMembersAddDto {
     public function __construct(
-        public int $projectId,
-        public int $userId,
+        public array $userIds,
     ) {}
 
     public static function fromJson(string $json): self {
@@ -16,21 +15,28 @@ class ProjectMembersAddDto {
             throw new InvalidArgumentException("Invalid JSON");
         }
 
+        // Преобразуем userIds в массив чисел, если пришел не массив - создаем массив из одного элемента
+        $userIds = $data['userIds'] ?? $data['userId'] ?? [];
+        if (!is_array($userIds)) {
+            $userIds = [$userIds];
+        }
+
         return new self(
-            $data['$projectId'] ?? 0,
-            $data['$userId'] ?? 0,
+            array_map('intval', $userIds)
         );
     }
 
     public function validate(): array {
         $errors = [];
 
-        if ($this->projectId < 1) {
-            $errors["projectId"] = "Project id must be greater than 0";
+        if (empty($this->userIds)) {
+            $errors["userIds"] = "At least one user ID is required";
         }
 
-        if ($this->userId < 1) {
-            $errors["userId"] = "User id must be greater than 0";
+        foreach ($this->userIds as $index => $userId) {
+            if ($userId < 1) {
+                $errors["userIds_$index"] = "User ID at position $index must be greater than 0";
+            }
         }
 
         return $errors;

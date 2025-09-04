@@ -16,7 +16,7 @@ class Card {
 
     private int $createdAt;
 
-    public function __construct(int $id, int $columnId, string $title, string $description, int $position, int $createdBy, int $createdAt)
+    public function __construct(int $id, int $columnId, string $title, string $description, int $position, int $createdBy)
     {
         $this->id = $id;
         $this->columnId = $columnId;
@@ -24,7 +24,6 @@ class Card {
         $this->description = $description;
         $this->position = $position;
         $this->createdBy = $createdBy;
-        $this->createdAt = $createdAt;
     }
 
     public function getId(): int
@@ -87,10 +86,6 @@ class Card {
         $this->createdBy = $createdBy;
     }
 
-    public function getCreatedAt(): int
-    {
-        return $this->createdAt;
-    }
 
     public function setCreatedAt(int $createdAt): void
     {

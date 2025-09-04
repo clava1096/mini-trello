@@ -26,8 +26,7 @@ class CommentsRepository implements CommentsRepositoryInterface {
     public function getAllComments(int $cardId): array {
         $stmt = $this->pdo->prepare("
         SELECT * FROM comments 
-        WHERE card_id = :card_id 
-        ORDER BY created_at DESC
+        WHERE card_id = :card_id
     ");
 
         $stmt->execute(['card_id' => $cardId]);
@@ -51,5 +50,19 @@ class CommentsRepository implements CommentsRepositoryInterface {
         $stmt = $this->pdo->prepare("DELETE FROM comments WHERE id = :id");
         $stmt->execute(['id' => $id]);
         return $stmt->rowCount() > 0;
+    }
+
+    public function getComment(int $commentId) {
+        $stmt = $this->pdo->prepare("SELECT * FROM comments where id = ?");
+        $stmt->execute([$commentId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $comment = new Comment(
+            $row['id'],
+            $row['card_id'],
+            $row['user_id'],
+            $row['content'],
+            $row['created_at']
+        );
+        return $comment;
     }
 }

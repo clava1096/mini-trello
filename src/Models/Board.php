@@ -7,14 +7,11 @@ class Board {
     private int $projectId;
     private string $name;
 
-    private int $createdAt;
-
-    public function __construct(int $id, int $projectId, string $name, int $createdAt)
+    public function __construct(int $id, int $projectId, string $name)
     {
         $this->id = $id;
         $this->projectId = $projectId;
         $this->name = $name;
-        $this->createdAt = $createdAt;
     }
 
     public function getId(): int
@@ -45,16 +42,6 @@ class Board {
     public function setName(string $name): void
     {
         $this->name = $name;
-    }
-
-    public function getCreatedAt(): int
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(int $createdAt): void
-    {
-        $this->createdAt = $createdAt;
     }
 
 }
